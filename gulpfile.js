@@ -4,6 +4,7 @@ const awspublish = require('gulp-awspublish');
 const homedir = require('os-homedir');
 const gutil = require('gulp-util');
 const fs = require('fs');
+const gRename = require('gulp-rename');
 
 // Load ENVIRONMENT variables from .env file
 require('dotenv').config();
@@ -45,14 +46,6 @@ gulp.task('publish', function () {
     if (!appName) {
         throw new gutil.PluginError('publish', 'Must set APP_NAME variable in .env file.'); 
     }
-    // const finalPath = `${appName}/${deployEnv}/`;
-
-    // Set all files to the proper env-based path
-
-    // if () {
-        
-    // }
-    // const s3BaseUrl
 
     const publisher = awspublish.create({
         accessKeyId: s3Config.key,
@@ -68,8 +61,13 @@ gulp.task('publish', function () {
     };
 
     return gulp.src('./build/static/**/*')
-        // gzip, Set Content-Encoding headers and add .gz extension
-        .pipe(awspublish.gzip({ ext: '.gz' }))
+        // Set all files to the proper env-based destination path
+        .pipe(gRename(function(path) {
+            path.dirname = Path.join(`${appName}/${deployEnv}/`, path.dirname);
+        }))
+
+        // gzip, Set Content-Encoding headers
+        .pipe(awspublish.gzip())
 
         // publisher will add Content-Length, Content-Type and headers specified above
         // If not specified it will set x-amz-acl to public-read by default
