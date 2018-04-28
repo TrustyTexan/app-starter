@@ -67,6 +67,7 @@ gulp.task('publish', function () {
         }))
 
         // gzip, Set Content-Encoding headers
+        // TODO: this zips all file types including images.  DON'T USE IMAGES IN YOUR APP :)`
         .pipe(awspublish.gzip())
 
         // publisher will add Content-Length, Content-Type and headers specified above
