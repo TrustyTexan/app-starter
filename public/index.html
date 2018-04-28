@@ -36,5 +36,31 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <script>
+      window.AppInfo = {};
+      function isDevEnv () {
+        return true;  
+      }
+
+      var isDev = isDevEnv();
+      if (isDev) {
+        window.AppInfo.jsScriptPath = 'static/';
+
+      } else {
+        var baseUri = '%REACT_APP_PROD_BASE_URI%';
+        var s3Bucket = '%REACT_APP_S3_BUCKET%';
+        var appName = '%REACT_APP_NAME%';
+        var env = decodeURIComponent((document.location.href.match(/[\\?&]env=([^&#]*)/) || []).pop() || '') || 'production';
+        window.AppInfo.jsScriptPath = baseUri + s3Bucket + '/' + appName + '/' + env + '/';
+      }
+
+      // https://www.nczonline.net/blog/2009/06/23/loading-javascript-without-blocking/
+      (function () {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = window.AppInfo.jsScriptPath + 'js/main.js';
+        document.getElementsByTagName("head")[0].appendChild(script);
+      })()
+    </script>
   </body>
 </html>

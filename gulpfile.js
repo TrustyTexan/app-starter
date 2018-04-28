@@ -42,16 +42,28 @@ gulp.task('publish', function () {
     // http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#constructor-property
     const s3Config = getS3Config();
     const deployEnv = getDeployEnv();
-    const appName = process.env.APP_NAME;
+    const appName = process.env.REACT_APP_NAME;
     if (!appName) {
-        throw new gutil.PluginError('publish', 'Must set APP_NAME variable in .env file.'); 
+        throw new gutil.PluginError('publish', 'Must set REACT_APP_NAME variable in .env file.'); 
     }
 
+    const accessKeyId = s3Config.key;
+    if (!accessKeyId) {
+        throw new gutil.PluginError('publish', 'Must set "key" attribute in your .aws-creds.json file.'); 
+    }
+    const secretAccessKey = s3Config.secret;
+    if (!secretAccessKey) {
+        throw new gutil.PluginError('publish', 'Must set "secret" attribute in your .aws-creds.json file.');
+    }
+    const s3Bucket = process.env.REACT_APP_S3_BUCKET;
+    if (!s3Bucket) {
+        throw new gutil.PluginError('publish', 'Must set "REACT_APP_S3_BUCKET" in your .env file.');
+    }
     const publisher = awspublish.create({
-        accessKeyId: s3Config.key,
-        secretAccessKey: s3Config.secret,
+        accessKeyId: accessKeyId,
+        secretAccessKey: secretAccessKey,
         params: {
-            Bucket: s3Config.bucket
+            Bucket: s3Bucket
         }
     });
 
